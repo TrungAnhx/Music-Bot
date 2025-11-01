@@ -1,0 +1,46 @@
+2025-11-01T15:59:31.634+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : Starting Launcher v4.1.1 using Java 20.0.2 with PID 11908 (C:\Users\TrungAnhx\Documents\MusicBot\Lavalink.jar started by TrungAnhx in C:\Users\TrungAnhx\Documents\MusicBot)
+2025-11-01T15:59:31.644+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : No active profile set, falling back to 1 default profile: "default"
+2025-11-01T15:59:32.195+07:00  INFO 11908 --- [Lavalink] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=3d6bf653-92ea-3fde-943a-10b9f8cd696e
+2025-11-01T15:59:32.505+07:00  INFO 11908 --- [Lavalink] [           main] l.server.bootstrap.PluginManager         : Loaded 'youtube-plugin-1.15.0.jar' (17 classes)
+2025-11-01T15:59:33.835+07:00  INFO 11908 --- [Lavalink] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-11-01T15:59:33.900+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : Started Launcher in 3.886 seconds (process running for 4.383)
+2025-11-01T15:59:35.137+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : 
+
+[32m       .  [31m _                  _ _       _    [32m__ _ _
+[32m      /\\ [31m| | __ ___   ____ _| (_)_ __ | | __[32m\ \ \ \
+[32m     ( ( )[31m| |/ _` \ \ / / _` | | | '_ \| |/ /[32m \ \ \ \
+[32m      \\/ [31m| | (_| |\ V / (_| | | | | | |   < [32m  ) ) ) )
+[32m       '  [31m|_|\__,_| \_/ \__,_|_|_|_| |_|_|\_\[32m / / / /
+[0m    =========================================[32m/_/_/_/[0m
+
+	Version:        4.1.1
+	Build time:     05.06.2025 07:37:42 UTC
+	Branch          HEAD
+	Commit:         4238202
+	Commit time:    05.06.2025 07:11:37 UTC
+	JVM:            20.0.2
+	Lavaplayer      2.2.3
+
+2025-11-01T15:59:35.155+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : No active profile set, falling back to 1 default profile: "default"
+2025-11-01T15:59:35.730+07:00  WARN 11908 --- [Lavalink] [           main] io.undertow.websockets.jsr               : UT026010: Buffer pool was not set on WebSocketDeploymentInfo, the default pool will be used
+2025-11-01T15:59:35.749+07:00  INFO 11908 --- [Lavalink] [           main] io.undertow.servlet                      : Initializing Spring embedded WebApplicationContext
+2025-11-01T15:59:35.755+07:00  INFO 11908 --- [Lavalink] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 590 ms
+2025-11-01T15:59:36.909+07:00  INFO 11908 --- [Lavalink] [           main] c.s.d.l.tools.GarbageCollectionMonitor   : GC monitoring enabled, reporting results every 2 minutes.
+2025-11-01T15:59:37.370+07:00  WARN 11908 --- [Lavalink] [           main] d.l.youtube.plugin.ClientProvider        : Failed to resolve ANDROID_TESTSUITE into a Client
+2025-11-01T15:59:37.374+07:00  WARN 11908 --- [Lavalink] [           main] dev.lavalink.youtube.clients.Android     : ANDROID is broken with no known fix. It is no longer advised to use this client.
+2025-11-01T15:59:37.374+07:00  INFO 11908 --- [Lavalink] [           main] d.l.youtube.plugin.YoutubePluginLoader   : Using remote cipher server with URL "http://127.0.0.1:8001/"
+2025-11-01T15:59:37.385+07:00  INFO 11908 --- [Lavalink] [           main] d.l.youtube.plugin.YoutubePluginLoader   : YouTube source initialised with clients: ANDROID, WEB, WEB_REMIX, TVHTML5_SIMPLY_EMBEDDED_PLAYER 
+2025-11-01T15:59:37.585+07:00  INFO 11908 --- [Lavalink] [           main] l.server.config.KoeConfiguration         : OS: WINDOWS, Arch: X86_64
+2025-11-01T15:59:37.596+07:00  INFO 11908 --- [Lavalink] [           main] l.server.config.KoeConfiguration         : Enabling JDA-NAS
+2025-11-01T15:59:37.596+07:00  INFO 11908 --- [Lavalink] [           main] c.s.l.c.natives.NativeLibraryLoader      : Native library udpqueue: loading with filter null
+2025-11-01T15:59:37.604+07:00  INFO 11908 --- [Lavalink] [           main] c.s.l.c.natives.NativeLibraryLoader      : Native library udpqueue: successfully loaded.
+2025-11-01T15:59:37.635+07:00  WARN 11908 --- [Lavalink] [           main] l.server.config.SentryConfiguration      : Turning off sentry
+2025-11-01T15:59:37.905+07:00  INFO 11908 --- [Lavalink] [           main] io.undertow                              : starting server: Undertow - 2.3.13.Final
+2025-11-01T15:59:37.915+07:00  INFO 11908 --- [Lavalink] [           main] org.xnio                                 : XNIO version 3.8.8.Final
+2025-11-01T15:59:37.921+07:00  INFO 11908 --- [Lavalink] [           main] org.xnio.nio                             : XNIO NIO Implementation Version 3.8.8.Final
+2025-11-01T15:59:38.000+07:00  INFO 11908 --- [Lavalink] [           main] org.jboss.threads                        : JBoss Threads version 3.5.0.Final
+2025-11-01T15:59:38.049+07:00  INFO 11908 --- [Lavalink] [           main] o.s.b.w.e.undertow.UndertowWebServer     : Undertow started on port 2333 (http) with context path '/'
+2025-11-01T15:59:39.220+07:00  INFO 11908 --- [Lavalink] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-11-01T15:59:40.400+07:00  INFO 11908 --- [Lavalink] [           main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2025-11-01T15:59:40.413+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : Started Launcher in 6.508 seconds (process running for 10.895)
+2025-11-01T15:59:40.415+07:00  INFO 11908 --- [Lavalink] [           main] lavalink.server.Launcher                 : Lavalink is ready to accept connections.

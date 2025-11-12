@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Submodule yt-cipher (chứa code riêng)
+yt-cipher/
+
 # Logs
 logs
 *.log

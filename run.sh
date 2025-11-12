@@ -38,7 +38,7 @@ if ! $PYTHON_CMD -m pip --version &> /dev/null; then
     $PYTHON_CMD -m ensurepip --upgrade
 fi
 
-# Kiểm tra và thiết lập Java 17
+# Kiểm tra và thiết lập Java 11
 export JAVA_HOME=/nix/store/*-openjdk-*/lib/openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 
@@ -51,22 +51,36 @@ if ! command -v java &> /dev/null; then
     exit 1
 fi
 
-# Kiểm tra xem có phải Java 17 không
-if [[ "$JAVA_VERSION" != "17" ]]; then
-    echo "Cần Java 17 cho Lavalink! Đang thử thiết lập lại..."
-    # Thử tìm Java 17
-    if command -v java-17 &> /dev/null; then
-        export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java-17))))
-    else
-        echo "Vui lòng重启 Replit để cài đặt Java 17"
-        exit 1
-    fi
+# Kiểm tra xem có phải Java 11 không
+if [[ "$JAVA_VERSION" != "11" ]]; then
+    echo "Cần Java 11 cho Lavalink 3.7.12! Java hiện tại: $JAVA_VERSION"
+    echo "Replit sẽ tự động sử dụng Java 11 sau khi rebuild."
+else
+    echo "✅ Java 11 đã sẵn sàng cho Lavalink 3.7.12!"
 fi
 
-# Kiểm tra file Lavalink.jar tồn tại
+# Kiểm tra và tải Lavalink.jar nếu cần
 if [ ! -f "Lavalink.jar" ]; then
-    echo "Không tìm thấy Lavalink.jar! Vui lòng tải file này lên Replit."
-    exit 1
+    echo "Không tìm thấy Lavalink.jar! Đang tải phiên bản tương thích Java 11..."
+    wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Đã tải Lavalink 3.7.12 thành công!"
+    else
+        echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
+        exit 1
+    fi
+else
+    echo "Tìm thấy Lavalink.jar"
+    
+    # Kiểm tra phiên bản Lavalink
+    if unzip -p Lavalink.jar META-INF/MANIFEST.MF | grep -q "Implementation-Version: 3.7.12"; then
+        echo "✅ Lavalink phiên bản 3.7.12 (tương thích Java 11)"
+    else
+        echo "⚠️ Lavalink có thể không tương thích Java 11. Đang tải phiên bản cũ hơn..."
+        mv Lavalink.jar Lavalink_old.jar
+        wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+    fi
 fi
 
 # Tạo thư mục logs nếu chưa có

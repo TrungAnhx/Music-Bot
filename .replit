@@ -1,6 +1,2 @@
 language = "python3"
 run = ["bash", "run.sh"]
-modules = ["web", "python-3.12", "bash"]
-
-[nix]
-channel = "stable-25_05"

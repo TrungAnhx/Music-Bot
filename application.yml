@@ -2,13 +2,6 @@ server:
   port: 2333
   address: 0.0.0.0
 
-plugins:
-  youtube:
-    enabled: true
-    remoteCipher:
-      url: "http://127.0.0.1:8001/"
-      userAgent: "musicbot"
-
 lavalink:
   server:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
@@ -20,37 +13,15 @@ lavalink:
       vimeo: true
       http: true
       local: false
-    bufferDurationMs: 400
-    frameBufferDurationMs: 5000
-    youtubePlaylistLoadLimit: 6
-    playerUpdateInterval: 5
-    youtubeSearchEnabled: true
-    soundcloudSearchEnabled: true
-    gc-warnings: true
 
-metrics:
-  prometheus:
+plugins:
+  youtube:
     enabled: false
-    endpoint: /metrics
-
-sentry:
-  dsn: ""
-  environment: ""
 
 logging:
   file:
-    max-history: 30
     max-size: 1GB
-  path: ./logs/
+    path: ./logs/
 
   level:
     root: INFO
-    lavalink: INFO
-
-  request:
-    enabled: true
-    includeClientInfo: true
-    includeHeaders: false
-    includeQueryString: true
-    includePayload: true
-    maxPayloadLength: 10000

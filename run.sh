@@ -61,11 +61,44 @@ fi
 
 # Kiểm tra và tải Lavalink.jar nếu cần
 if [ ! -f "Lavalink.jar" ]; then
-    echo "Không tìm thấy Lavalink.jar! Đang tải phiên bản tương thích Java 11..."
-    curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+    echo "Không tìm thấy Lavalink.jar! Đang tải Lavalink 4.0.9 (tương thích Java 11)..."
+    curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
     
     if [ $? -eq 0 ]; then
-        echo "✅ Đã tải Lavalink 3.7.12 thành công!"
+        echo "✅ Đã tải Lavalink 4.0.9 thành công!"
+        echo "📝 Tạo application.yml cho Lavalink 4.x..."
+        # Tạo application.yml cho Lavalink 4.x nếu chưa có
+        if [ ! -f "application.yml" ]; then
+            cat > application.yml << EOF
+server:
+  port: 2333
+  address: 0.0.0.0
+
+lavalink:
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: false
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      http: true
+      local: false
+
+plugins:
+  youtube:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+  file:
+    max-size: 1GB
+    path: ./logs/
+
+EOF
+        fi
     else
         echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
         exit 1
@@ -77,16 +110,16 @@ else
     if file Lavalink.jar | grep -q "Zip archive"; then
         echo "✅ Lavalink.jar là file hợp lệ"
         # Kiểm tra phiên bản Lavalink
-        if unzip -p Lavalink.jar META-INF/MANIFEST.MF 2>/dev/null | grep -q "Implementation-Version: 3.7.12"; then
-            echo "✅ Lavalink phiên bản 3.7.12 (tương thích Java 11)"
+        if unzip -p Lavalink.jar META-INF/MANIFEST.MF 2>/dev/null | grep -q "Implementation-Version: 4.0.9"; then
+            echo "✅ Lavalink phiên bản 4.0.9 (tương thích wavelink mới)"
         else
-            echo "⚠️ Lavalink có thể không tương thích Java 11. Đang tải phiên bản cũ hơn..."
+            echo "⚠️ Lavalink có thể không phải version 4. Đang tải lại..."
             mv Lavalink.jar Lavalink_old.jar 2>/dev/null
-            curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+            curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
         fi
     else
         echo "❌ Lavalink.jar không hợp lệ! Đang tải lại..."
-        curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+        curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
     fi
 fi
 

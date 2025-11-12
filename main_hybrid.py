@@ -459,7 +459,7 @@ async def setup_hook():
     # Nếu là localhost, sử dụng 127.0.0.1
     lavalink_uri = os.environ.get("LAVALINK_URI", "http://127.0.0.1:2333")
     
-    node = wavelink.Node(uri=lavalink_uri, password="youshallnotpass")
+    node = wavelink.Node(uri=lavalink_uri, password=os.environ.get("LAVALINK_PASSWORD", "youshallnotpass"))
     await wavelink.Pool.connect(nodes=[node], client=client, cache_capacity=100)
     await client.tree.sync()
 
@@ -476,7 +476,9 @@ async def musichelp(interaction: discord.Interaction):
 async def main():
     import os
     # Lấy token từ environment variables để bảo mật
-    token = os.environ.get("DISCORD_TOKEN", 'MTI3MDc3NTc2Mzc4Nzk3MjYwOA.GOpS-r.DGc8gWsBcQfdLAOaUmIOb8ZfUVzRzSUPw4FANM')
+    token = os.environ.get("DISCORD_TOKEN")
+    if not token:
+        raise ValueError("DISCORD_TOKEN không được tìm thấy trong environment variables!")
     
     await client.add_cog(MusicBot(client))
     await client.start(token)

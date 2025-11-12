@@ -1,6 +1,6 @@
 server:
   port: 2333
-  address: 127.0.0.1
+  address: 0.0.0.0
 
 plugins:
   youtube:
@@ -11,7 +11,7 @@ plugins:
 
 lavalink:
   server:
-    password: "youshallnotpass"
+    password: "${LAVALINK_PASSWORD:youshallnotpass}"
     sources:
       youtube: false
       bandcamp: true

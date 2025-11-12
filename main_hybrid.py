@@ -452,8 +452,14 @@ async def on_ready():
     print(f"✅ Bot đã sẵn sàng với tên: {client.user}")
 
 async def setup_hook():
-    # Connect to LOCAL Lavalink server
-    node = wavelink.Node(uri="http://127.0.0.1:2333", password="youshallnotpass")
+    # Kiểm tra môi trường để chọn Lavalink URI
+    import os
+    
+    # Nếu là Replit hoặc môi trường cloud, sử dụng 0.0.0.0
+    # Nếu là localhost, sử dụng 127.0.0.1
+    lavalink_uri = os.environ.get("LAVALINK_URI", "http://127.0.0.1:2333")
+    
+    node = wavelink.Node(uri=lavalink_uri, password="youshallnotpass")
     await wavelink.Pool.connect(nodes=[node], client=client, cache_capacity=100)
     await client.tree.sync()
 
@@ -468,7 +474,11 @@ async def musichelp(interaction: discord.Interaction):
     )
 
 async def main():
+    import os
+    # Lấy token từ environment variables để bảo mật
+    token = os.environ.get("DISCORD_TOKEN", 'MTI3MDc3NTc2Mzc4Nzk3MjYwOA.GOpS-r.DGc8gWsBcQfdLAOaUmIOb8ZfUVzRzSUPw4FANM')
+    
     await client.add_cog(MusicBot(client))
-    await client.start('MTI3MDc3NTc2Mzc4Nzk3MjYwOA.GOpS-r.DGc8gWsBcQfdLAOaUmIOb8ZfUVzRzSUPw4FANM')
+    await client.start(token)
 
 asyncio.run(main())

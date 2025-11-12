@@ -1,15 +1,23 @@
 #!/bin/bash
 # Script chạy bot cho Replit (đơn giản và ổn định)
 
-echo "🎵 Discord Music Bot - Starting..."
+echo "🎵 Discord Music Bot - Starting with Java 17..."
+
+# Set JAVA_HOME cho Java 17
+export JAVA_HOME=/nix/store/*-openjdk*/lib/openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+echo "🐍 Java: $(java -version 2>&1 | head -n 1)"
+echo "📌 JAVA_HOME: $JAVA_HOME"
 
 # Tải Lavalink 4.1.1 nếu chưa có
 if [ ! -f "Lavalink.jar" ]; then
-    echo "📥 Downloading Lavalink 4.1.1..."
+    echo "📥 Downloading Lavalink 4.1.1 (requires Java 17)..."
     curl -L -o Lavalink.jar "https://github.com/lavalink-devs/Lavalink/releases/download/4.1.1/Lavalink.jar"
     
     if [ $? -eq 0 ] && [ -s "Lavalink.jar" ]; then
         echo "✅ Lavalink 4.1.1 downloaded successfully!"
+        echo "📝 File size: $(du -h Lavalink.jar | cut -f1)"
     else
         echo "❌ Download failed! Trying CDN..."
         curl -L -o Lavalink.jar "https://cdn.jsdelivr.net/gh/lavalink-devs/Lavalink@4.1.1/Lavalink.jar"
@@ -75,6 +83,16 @@ if ! kill -0 $LAVALINK_PID 2>/dev/null; then
 fi
 
 echo "✅ Lavalink started successfully!"
+
+# Kiểm tra phiên bản Java
+JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2)
+echo "Java version: $JAVA_VERSION"
+
+if [[ "$JAVA_VERSION" == *"17"* ]]; then
+    echo "✅ Java 17 detected - Perfect for Lavalink 4.1.1!"
+else
+    echo "⚠️ Warning: Java $JAVA_VERSION detected (Lavalink 4.1.1 recommends Java 17)"
+fi
 
 # Tìm Python và chạy bot
 echo "🐍 Starting Discord Bot..."

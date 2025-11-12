@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Đợi cài đặt hoàn tất (Replit cần thời gian để cài Python từ nix)
+echo "Đợi Replit cài đặt môi trường..."
+sleep 10
+
 # Tìm Python command trên Replit
 PYTHON_CMD=""
 if command -v python3 &> /dev/null; then
@@ -11,11 +15,28 @@ elif command -v python3.9 &> /dev/null; then
 elif command -v python &> /dev/null; then
     PYTHON_CMD="python"
 else
-    echo "Không tìm thấy Python! Kiểm tra lại cài đặt Python trên Replit."
-    exit 1
+    echo "Không tìm thấy Python! Tự động cấu hình lại..."
+    
+    # Thử cài đặt pip cho Python
+    if command -v python &> /dev/null; then
+        echo "Tìm thấy python, cài đặt pip..."
+        python -m ensurepip --upgrade
+        PYTHON_CMD="python"
+    else
+        echo "Python chưa được cài. Replit sẽ tự động cài sau khi rebuild."
+        echo "Vui lòng vào Shell và chạy: nix-shell --run 'python --version'"
+        echo "Sau đó chạy lại bot."
+        exit 1
+    fi
 fi
 
 echo "Sử dụng Python command: $PYTHON_CMD"
+
+# Kiểm tra pip đã được cài đặt chưa
+if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+    echo "Pip chưa được cài, đang cài đặt..."
+    $PYTHON_CMD -m ensurepip --upgrade
+fi
 
 # Kiểm tra Java đã được cài đặt chưa
 if ! command -v java &> /dev/null; then

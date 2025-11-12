@@ -188,6 +188,12 @@ class MusicBot(commands.Cog):
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload):
         logging.info(f"Lavalink node {payload.node.identifier} is ready!")
+        print(f"✅ Lavalink node {payload.node.identifier} đã sẵn sàng!")
+
+    @commands.Cog.listener()
+    async def on_wavelink_node_exception(self, payload):
+        logging.error(f"Lavalink node exception: {payload}")
+        print(f"❌ Lỗi Lavalink: {payload}")
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload):
@@ -459,9 +465,17 @@ async def setup_hook():
     # Nếu là localhost, sử dụng 127.0.0.1
     lavalink_uri = os.environ.get("LAVALINK_URI", "http://127.0.0.1:2333")
     
-    node = wavelink.Node(uri=lavalink_uri, password=os.environ.get("LAVALINK_PASSWORD", "youshallnotpass"))
+    # Lấy password từ environment variables
+    lavalink_password = os.environ.get("LAVALINK_PASSWORD", "youshallnotpass")
+    
+    print(f"Đang kết nối đến Lavalink tại: {lavalink_uri}")
+    print(f"Password: {'*' * len(lavalink_password)}")
+    
+    node = wavelink.Node(uri=lavalink_uri, password=lavalink_password)
     await wavelink.Pool.connect(nodes=[node], client=client, cache_capacity=100)
     await client.tree.sync()
+    
+    print(f"✅ Đã kết nối thành công đến Lavalink!")
 
 client.setup_hook = setup_hook
 

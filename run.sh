@@ -38,10 +38,29 @@ if ! $PYTHON_CMD -m pip --version &> /dev/null; then
     $PYTHON_CMD -m ensurepip --upgrade
 fi
 
-# Kiểm tra Java đã được cài đặt chưa
+# Kiểm tra và thiết lập Java 17
+export JAVA_HOME=/nix/store/*-openjdk-*/lib/openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Kiểm tra Java version
+JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
+echo "Java version: $JAVA_VERSION"
+
 if ! command -v java &> /dev/null; then
-    echo "Java chưa được cài đặt! Đang thử cài đặt..."
-    # Replit thường cài Java qua nix, chỉ cần kiểm tra
+    echo "Java chưa được cài đặt! Vui lòng đợi Replit cài đặt từ replit.nix"
+    exit 1
+fi
+
+# Kiểm tra xem có phải Java 17 không
+if [[ "$JAVA_VERSION" != "17" ]]; then
+    echo "Cần Java 17 cho Lavalink! Đang thử thiết lập lại..."
+    # Thử tìm Java 17
+    if command -v java-17 &> /dev/null; then
+        export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java-17))))
+    else
+        echo "Vui lòng重启 Replit để cài đặt Java 17"
+        exit 1
+    fi
 fi
 
 # Kiểm tra file Lavalink.jar tồn tại

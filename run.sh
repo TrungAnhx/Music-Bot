@@ -61,15 +61,21 @@ fi
 
 # Kiểm tra và tải Lavalink.jar nếu cần
 if [ ! -f "Lavalink.jar" ]; then
-    echo "Không tìm thấy Lavalink.jar! Đang tải Lavalink 4.0.9 (tương thích Java 11)..."
+    echo "Không tìm thấy Lavalink.jar! Đang tải Lavalink 4.0.9..."
+    
+    # Thử tải từ mirror chính
     curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
     
-    if [ $? -eq 0 ]; then
-        echo "✅ Đã tải Lavalink 4.0.9 thành công!"
-        echo "📝 Tạo application.yml cho Lavalink 4.x..."
-        # Tạo application.yml cho Lavalink 4.x nếu chưa có
-        if [ ! -f "application.yml" ]; then
-            cat > application.yml << EOF
+    # Kiểm tra xem download thành công và file không hỏng
+    if [ $? -eq 0 ] && [ -s "Lavalink.jar" ]; then
+        # Kiểm tra file có hợp lệ
+        if file Lavalink.jar | grep -q "Zip archive"; then
+            echo "✅ Đã tải Lavalink 4.0.9 thành công!"
+            
+            # Tạo application.yml cho Lavalink 4.x nếu chưa có
+            if [ ! -f "application.yml" ]; then
+                echo "📝 Tạo application.yml cho Lavalink 4.x..."
+                cat > application.yml << EOF
 server:
   port: 2333
   address: 0.0.0.0
@@ -96,12 +102,40 @@ logging:
   file:
     max-size: 1GB
     path: ./logs/
-
 EOF
+            fi
+        else
+            echo "❌ File tải về không hợp lệ! Thử lại..."
+            rm -f Lavalink.jar
+            # Thử mirror khác
+            curl -L -o Lavalink.jar "https://github.com/lavalink-devs/Lavalink/releases/download/4.0.9/Lavalink.jar"
+            
+            if [ $? -eq 0 ] && [ -s "Lavalink.jar" ] && file Lavalink.jar | grep -q "Zip archive"; then
+                echo "✅ Đã tải Lavalink từ mirror thay thế!"
+            else
+                echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
+                exit 1
+            fi
         fi
     else
-        echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
-        exit 1
+        echo "❌ Không thể tải Lavalink.jar. Thử phương pháp khác..."
+        
+        # Thôi có, xóa file nếu có và thử lại
+        rm -f Lavalink.jar
+        echo "Đang tải lại với wget (nếu có)..."
+        
+        if command -v wget &> /dev/null; then
+            wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
+        else
+            curl -k -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
+        fi
+        
+        if [ $? -eq 0 ] && [ -s "Lavalink.jar" ]; then
+            echo "✅ Tải lại thành công!"
+        else
+            echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
+            exit 1
+        fi
     fi
 else
     echo "Tìm thấy Lavalink.jar"
@@ -119,7 +153,21 @@ else
         fi
     else
         echo "❌ Lavalink.jar không hợp lệ! Đang tải lại..."
-        curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
+        rm -f Lavalink.jar
+        # Thử download đơn giản hơn
+        curl -L -o Lavalink.jar "https://nightly.link/Lavalink/Lavalink.jar"
+        
+        # Đợi 3 giây để file được ghi hoàn toàn
+        sleep 3
+        
+        if [ -s "Lavalink.jar" ]; then
+            echo "✅ Đã tải lại Lavalink.jar!"
+        else
+            echo "❌ Tải thất bại. Thử phương pháp cuối cùng..."
+            # Tải file từ jsDelivr
+            curl -L -o Lavalink.jar "https://cdn.jsdelivr.net/gh/freyacodes/Lavalink@4.0.9/Lavalink.jar"
+            sleep 2
+        fi
     fi
 fi
 

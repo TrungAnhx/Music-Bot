@@ -1,3 +1,4 @@
 discord.py
 wavelink
 yt-dlp
+flask

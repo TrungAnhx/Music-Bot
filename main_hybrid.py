@@ -475,10 +475,21 @@ async def musichelp(interaction: discord.Interaction):
 
 async def main():
     import os
+    import sys
+    
     # Lấy token từ environment variables để bảo mật
     token = os.environ.get("DISCORD_TOKEN")
     if not token:
         raise ValueError("DISCORD_TOKEN không được tìm thấy trong environment variables!")
+    
+    # Bật keep_alive nếu đang chạy trên Replit (kiểm tra environment variable)
+    if os.environ.get("REPL_ID"):
+        try:
+            from keep_alive import keep_alive
+            keep_alive()
+            print("✅ Keep-alive server đã được khởi động")
+        except Exception as e:
+            print(f"⚠️ Không thể khởi động keep-alive: {e}")
     
     await client.add_cog(MusicBot(client))
     await client.start(token)

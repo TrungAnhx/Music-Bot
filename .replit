@@ -1,2 +1,7 @@
 language = "python3"
 run = ["bash", "run.sh"]
+
+[hidden]
+[packager]
+language = "python3"
+ignoredPackages = []

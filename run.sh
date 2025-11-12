@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Đợi cài đặt hoàn tất (Replit cần thời gian để cài Python từ nix)
-echo "Đợi Replit cài đặt môi trường..."
-sleep 10
-
 # Tìm Python command trên Replit
 PYTHON_CMD=""
 if command -v python3 &> /dev/null; then
@@ -15,28 +11,15 @@ elif command -v python3.9 &> /dev/null; then
 elif command -v python &> /dev/null; then
     PYTHON_CMD="python"
 else
-    echo "Không tìm thấy Python! Tự động cấu hình lại..."
-    
-    # Thử cài đặt pip cho Python
-    if command -v python &> /dev/null; then
-        echo "Tìm thấy python, cài đặt pip..."
-        python -m ensurepip --upgrade
-        PYTHON_CMD="python"
-    else
-        echo "Python chưa được cài. Replit sẽ tự động cài sau khi rebuild."
-        echo "Vui lòng vào Shell và chạy: nix-shell --run 'python --version'"
-        echo "Sau đó chạy lại bot."
-        exit 1
-    fi
+    echo "Không tìm thấy Python! Kiểm tra lại cài đặt Python trên Replit."
+    exit 1
 fi
 
 echo "Sử dụng Python command: $PYTHON_CMD"
 
-# Kiểm tra pip đã được cài đặt chưa
-if ! $PYTHON_CMD -m pip --version &> /dev/null; then
-    echo "Pip chưa được cài, đang cài đặt..."
-    $PYTHON_CMD -m ensurepip --upgrade
-fi
+# Đợi cài đặt hoàn tất (Replit cần thời gian để cài Python từ nix)
+echo "Đợi Replit cài đặt môi trường..."
+sleep 10
 
 # Kiểm tra và thiết lập Java 11
 export JAVA_HOME=/nix/store/*-openjdk-*/lib/openjdk
@@ -53,122 +36,35 @@ fi
 
 # Kiểm tra xem có phải Java 11 không
 if [[ "$JAVA_VERSION" != "11" ]]; then
-    echo "Cần Java 11 cho Lavalink 3.7.12! Java hiện tại: $JAVA_VERSION"
+    echo "Cần Java 11 cho Lavalink! Java hiện tại: $JAVA_VERSION"
     echo "Replit sẽ tự động sử dụng Java 11 sau khi rebuild."
 else
-    echo "✅ Java 11 đã sẵn sàng cho Lavalink 3.7.12!"
+    echo "✅ Java 11 đã sẵn sàng cho Lavalink 4.1.1!"
+fi
+
+# Kiểm tra pip đã được cài đặt chưa
+if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+    echo "Pip chưa được cài, đang cài đặt..."
+    $PYTHON_CMD -m ensurepip --upgrade
 fi
 
 # Kiểm tra và tải Lavalink.jar nếu cần
 if [ ! -f "Lavalink.jar" ]; then
-    echo "Không tìm thấy Lavalink.jar! Đang tải Lavalink 4.0.9..."
+    echo "Không tìm thấy Lavalink.jar! Đang chạy script tải Lavalink 4.1.1..."
     
-    # Thử tải từ mirror chính
-    curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
+    # Dùng script tải đã verify
+    chmod +x download_lavalink.sh
+    ./download_lavalink.sh
     
-    # Kiểm tra xem download thành công và file không hỏng
+    # Kiểm tra kết quả
     if [ $? -eq 0 ] && [ -s "Lavalink.jar" ]; then
-        # Kiểm tra file có hợp lệ
-        if file Lavalink.jar | grep -q "Zip archive"; then
-            echo "✅ Đã tải Lavalink 4.0.9 thành công!"
-            
-            # Tạo application.yml cho Lavalink 4.x nếu chưa có
-            if [ ! -f "application.yml" ]; then
-                echo "📝 Tạo application.yml cho Lavalink 4.x..."
-                cat > application.yml << EOF
-server:
-  port: 2333
-  address: 0.0.0.0
-
-lavalink:
-  server:
-    password: "youshallnotpass"
-    sources:
-      youtube: false
-      bandcamp: true
-      soundcloud: true
-      twitch: true
-      vimeo: true
-      http: true
-      local: false
-
-plugins:
-  youtube:
-    enabled: false
-
-logging:
-  level:
-    root: INFO
-  file:
-    max-size: 1GB
-    path: ./logs/
-EOF
-            fi
-        else
-            echo "❌ File tải về không hợp lệ! Thử lại..."
-            rm -f Lavalink.jar
-            # Thử mirror khác
-            curl -L -o Lavalink.jar "https://github.com/lavalink-devs/Lavalink/releases/download/4.0.9/Lavalink.jar"
-            
-            if [ $? -eq 0 ] && [ -s "Lavalink.jar" ] && file Lavalink.jar | grep -q "Zip archive"; then
-                echo "✅ Đã tải Lavalink từ mirror thay thế!"
-            else
-                echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
-                exit 1
-            fi
-        fi
+        echo "✅ Script tải Lavalink thành công!"
     else
-        echo "❌ Không thể tải Lavalink.jar. Thử phương pháp khác..."
-        
-        # Thôi có, xóa file nếu có và thử lại
-        rm -f Lavalink.jar
-        echo "Đang tải lại với wget (nếu có)..."
-        
-        if command -v wget &> /dev/null; then
-            wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
-        else
-            curl -k -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
-        fi
-        
-        if [ $? -eq 0 ] && [ -s "Lavalink.jar" ]; then
-            echo "✅ Tải lại thành công!"
-        else
-            echo "❌ Không thể tải Lavalink.jar. Vui lòng tải thủ công."
-            exit 1
-        fi
+        echo "❌ Script tải thất bại! Vui lòng tải thủ công."
+        exit 1
     fi
 else
     echo "Tìm thấy Lavalink.jar"
-    
-    # Kiểm tra file có hợp lệ không
-    if file Lavalink.jar | grep -q "Zip archive"; then
-        echo "✅ Lavalink.jar là file hợp lệ"
-        # Kiểm tra phiên bản Lavalink
-        if unzip -p Lavalink.jar META-INF/MANIFEST.MF 2>/dev/null | grep -q "Implementation-Version: 4.0.9"; then
-            echo "✅ Lavalink phiên bản 4.0.9 (tương thích wavelink mới)"
-        else
-            echo "⚠️ Lavalink có thể không phải version 4. Đang tải lại..."
-            mv Lavalink.jar Lavalink_old.jar 2>/dev/null
-            curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/4.0.9/Lavalink.jar"
-        fi
-    else
-        echo "❌ Lavalink.jar không hợp lệ! Đang tải lại..."
-        rm -f Lavalink.jar
-        # Thử download đơn giản hơn
-        curl -L -o Lavalink.jar "https://nightly.link/Lavalink/Lavalink.jar"
-        
-        # Đợi 3 giây để file được ghi hoàn toàn
-        sleep 3
-        
-        if [ -s "Lavalink.jar" ]; then
-            echo "✅ Đã tải lại Lavalink.jar!"
-        else
-            echo "❌ Tải thất bại. Thử phương pháp cuối cùng..."
-            # Tải file từ jsDelivr
-            curl -L -o Lavalink.jar "https://cdn.jsdelivr.net/gh/freyacodes/Lavalink@4.0.9/Lavalink.jar"
-            sleep 2
-        fi
-    fi
 fi
 
 # Kiểm tra cuối cùng

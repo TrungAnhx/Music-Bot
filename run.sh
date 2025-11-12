@@ -1,5 +1,22 @@
 #!/bin/bash
 
+# Tìm Python command trên Replit
+PYTHON_CMD=""
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python3.10 &> /dev/null; then
+    PYTHON_CMD="python3.10"
+elif command -v python3.9 &> /dev/null; then
+    PYTHON_CMD="python3.9"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo "Không tìm thấy Python! Kiểm tra lại cài đặt Python trên Replit."
+    exit 1
+fi
+
+echo "Sử dụng Python command: $PYTHON_CMD"
+
 # Kiểm tra Java đã được cài đặt chưa
 if ! command -v java &> /dev/null; then
     echo "Java chưa được cài đặt! Đang thử cài đặt..."
@@ -37,4 +54,4 @@ echo "Lavalink đã khởi động thành công!"
 
 # Chạy bot Python
 echo "Khởi động Discord bot..."
-python main_hybrid.py
+$PYTHON_CMD main_hybrid.py

@@ -62,7 +62,7 @@ fi
 # Kiểm tra và tải Lavalink.jar nếu cần
 if [ ! -f "Lavalink.jar" ]; then
     echo "Không tìm thấy Lavalink.jar! Đang tải phiên bản tương thích Java 11..."
-    wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+    curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
     
     if [ $? -eq 0 ]; then
         echo "✅ Đã tải Lavalink 3.7.12 thành công!"
@@ -73,14 +73,27 @@ if [ ! -f "Lavalink.jar" ]; then
 else
     echo "Tìm thấy Lavalink.jar"
     
-    # Kiểm tra phiên bản Lavalink
-    if unzip -p Lavalink.jar META-INF/MANIFEST.MF | grep -q "Implementation-Version: 3.7.12"; then
-        echo "✅ Lavalink phiên bản 3.7.12 (tương thích Java 11)"
+    # Kiểm tra file có hợp lệ không
+    if file Lavalink.jar | grep -q "Zip archive"; then
+        echo "✅ Lavalink.jar là file hợp lệ"
+        # Kiểm tra phiên bản Lavalink
+        if unzip -p Lavalink.jar META-INF/MANIFEST.MF 2>/dev/null | grep -q "Implementation-Version: 3.7.12"; then
+            echo "✅ Lavalink phiên bản 3.7.12 (tương thích Java 11)"
+        else
+            echo "⚠️ Lavalink có thể không tương thích Java 11. Đang tải phiên bản cũ hơn..."
+            mv Lavalink.jar Lavalink_old.jar 2>/dev/null
+            curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+        fi
     else
-        echo "⚠️ Lavalink có thể không tương thích Java 11. Đang tải phiên bản cũ hơn..."
-        mv Lavalink.jar Lavalink_old.jar
-        wget -O Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
+        echo "❌ Lavalink.jar không hợp lệ! Đang tải lại..."
+        curl -L -o Lavalink.jar "https://github.com/freyacodes/Lavalink/releases/download/3.7.12/Lavalink.jar"
     fi
+fi
+
+# Kiểm tra cuối cùng
+if [ ! -s "Lavalink.jar" ]; then
+    echo "❌ Lavalink.jar trống hoặc không tồn tại! Không thể tiếp tục."
+    exit 1
 fi
 
 # Tạo thư mục logs nếu chưa có

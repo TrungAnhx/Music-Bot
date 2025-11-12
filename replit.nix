@@ -6,5 +6,6 @@
     pkgs.python310Full
     pkgs.python310Packages.pip
     pkgs.unzip
+    pkgs.file
   ];
 }

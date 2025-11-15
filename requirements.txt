@@ -2,3 +2,4 @@ discord.py
 wavelink
 yt-dlp
 flask
+python-dotenv

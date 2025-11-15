@@ -4,10 +4,15 @@ import wavelink
 import yt_dlp
 import asyncio
 import logging
+import os
+from dotenv import load_dotenv
 from collections import defaultdict, deque
 from urllib.parse import parse_qs, urlencode, urlparse
 
 from yt_dlp import utils as ytdl_utils
+
+# Tải các biến môi trường từ file .env
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 logging.basicConfig(level=logging.INFO)
 
@@ -495,6 +500,7 @@ async def main():
     token = os.environ.get("DISCORD_TOKEN")
     if not token:
         raise ValueError("DISCORD_TOKEN không được tìm thấy trong environment variables!")
+    print(f"Token (đầu 10 ký tự): {token[:10]}...")  # In ra 10 ký tự đầu để kiểm tra
     
     # Bật keep_alive nếu đang chạy trên Replit (kiểm tra environment variable)
     if os.environ.get("REPL_ID"):

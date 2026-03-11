@@ -5,6 +5,7 @@ import yt_dlp
 import asyncio
 import logging
 import os
+import re
 from dotenv import load_dotenv
 from collections import defaultdict, deque
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -30,6 +31,11 @@ YDL_OPTIONS = {
     'extract_flat': False,
     'force_client': 'android',
     'extractor_args': {'youtube': {'player_client': ['android']}},
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'opus',
+        'preferredquality': '192',
+    }],
 }
 
 HELP_MESSAGE = (
@@ -98,23 +104,41 @@ class MusicBot(commands.Cog):
             self.disconnect_tasks.pop(guild_id, None)
 
     async def _resolve_track(self, query: str):
-        try:
-            result = await wavelink.Playable.search(query)
-        except Exception as exc:
-            logging.warning(f"Primary search failed for '{query}': {exc}")
-            return None
+        # Helper để lấy track đầu tiên từ kết quả
+        def get_first_track(result):
+            if not result:
+                return None
+            if hasattr(result, 'tracks'):
+                return result.tracks[0] if result.tracks else None
+            if isinstance(result, (list, tuple)):
+                return result[0] if result else None
+            return result
 
-        track = None
+        # Nếu là URL, search trực tiếp
+        if re.match(r'^https?://', query):
+            try:
+                result = await wavelink.Playable.search(query)
+                return get_first_track(result)
+            except Exception as exc:
+                logging.warning(f"Direct URL search failed for '{query}': {exc}")
+                return None
 
-        if hasattr(result, 'tracks'):
-            tracks = result.tracks
-            track = tracks[0] if tracks else None
-        elif isinstance(result, (list, tuple)):
-            track = result[0] if result else None
-        else:
-            track = result
+        # Nếu là từ khóa, thử các nguồn ưu tiên: YouTube Music -> YouTube -> SoundCloud
+        sources = ['ytmsearch', 'ytsearch', 'scsearch']
+        
+        for source in sources:
+            try:
+                search_query = f"{source}:{query}"
+                result = await wavelink.Playable.search(search_query)
+                track = get_first_track(result)
+                
+                if track:
+                    return track
+            except Exception as exc:
+                logging.warning(f"Search with {source} failed for '{query}': {exc}")
+                continue
 
-        return track
+        return None
 
     async def _fallback_track(self, query: str):
         try:
@@ -261,7 +285,8 @@ class MusicBot(commands.Cog):
         # Connect to voice if not already
         if not ctx.voice_client:
             try:
-                player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
+                # self_deaf=True giúp tiết kiệm băng thông vì bot không cần nghe user nói
+                player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player, self_deaf=True)
             except Exception as e:
                 logging.error(f"Error connecting: {e}")
                 return await ctx.send(f"❌ Không thể kết nối vào voice: {str(e)}")
@@ -502,14 +527,13 @@ async def main():
         raise ValueError("DISCORD_TOKEN không được tìm thấy trong environment variables!")
     print(f"Token (đầu 10 ký tự): {token[:10]}...")  # In ra 10 ký tự đầu để kiểm tra
     
-    # Bật keep_alive nếu đang chạy trên Replit (kiểm tra environment variable)
-    if os.environ.get("REPL_ID"):
-        try:
-            from keep_alive import keep_alive
-            keep_alive()
-            print("✅ Keep-alive server đã được khởi động")
-        except Exception as e:
-            print(f"⚠️ Không thể khởi động keep-alive: {e}")
+    # Kích hoạt keep_alive cho Hugging Face Spaces
+    try:
+        from keep_alive import keep_alive
+        keep_alive()
+        print("✅ Keep-alive server đã được khởi động trên cổng 7860")
+    except Exception as e:
+        print(f"⚠️ Không thể khởi động keep-alive: {e}")
     
     await client.add_cog(MusicBot(client))
     await client.start(token)

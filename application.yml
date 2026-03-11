@@ -5,6 +5,8 @@ server:
 lavalink:
   server:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
+    bufferDurationMs: 1000
+    frameBufferDurationMs: 1000
     sources:
       youtube: false
       bandcamp: true
@@ -16,7 +18,14 @@ lavalink:
 
 plugins:
   youtube:
-    enabled: false
+    enabled: true
+    # Tối ưu hóa client để tìm nhạc nhanh hơn và tránh bị chặn
+    clients:
+      - MUSIC
+      - ANDROID_VR
+      - WEB
+      - WEBEMBEDDED
+    allowSearch: true
 
 logging:
   file:

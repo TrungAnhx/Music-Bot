@@ -123,8 +123,9 @@ class MusicBot(commands.Cog):
                 logging.warning(f"Direct URL search failed for '{query}': {exc}")
                 return None
 
-        # Nếu là từ khóa, thử các nguồn ưu tiên: YouTube Music -> YouTube -> SoundCloud
-        sources = ['ytmsearch', 'ytsearch', 'scsearch']
+        # Nếu là từ khóa, thử các nguồn ưu tiên: SoundCloud -> YouTube Music -> YouTube
+        # Ưu tiên SoundCloud vì Youtube đang chặn rất gắt trên server cloud
+        sources = ['scsearch', 'ytmsearch', 'ytsearch']
         
         for source in sources:
             try:

@@ -63,7 +63,7 @@ class MusicBot(commands.Cog):
         self.history = defaultdict(lambda: deque(maxlen=25))
         self.current = {}
         self.disconnect_tasks = {}
-        self.ytdl_options = {**YDL_OPTIONS, 'default_search': 'scsearch1'}
+        self.ytdl_options = {**YDL_OPTIONS, 'default_search': 'ytsearch1'}
         self.text_channels = {}
         self.track_sources = {}
 

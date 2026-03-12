@@ -7,21 +7,19 @@ lavalink:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
     bufferDurationMs: 1000
     frameBufferDurationMs: 1000
-    # Tắt hoàn toàn plugin youtube có sẵn của Lavalink để tránh bị crash
-    youtubeSearchEnabled: false
+    youtubeSearchEnabled: true
     sources:
-      youtube: false  # TẮT YOUTUBE ĐỂ TRÁNH LỖI IP
+      youtube: true
       bandcamp: true
-      soundcloud: true # BẬT SOUNDCLOUD
+      soundcloud: true
       twitch: true
       vimeo: true
       http: true
       local: false
 
-# Nếu đang dùng plugin Youtube bên ngoài, cũng phải vô hiệu hóa nó
 plugins:
   youtube:
-    enabled: false # TẮT PLUGIN YOUTUBE
+    enabled: true
 
 logging:
   file:

@@ -29,13 +29,14 @@ YDL_OPTIONS = {
     'no_warnings': True,
     'noplaylist': False,
     'extract_flat': False,
-    'force_client': 'android',
-    'extractor_args': {'youtube': {'player_client': ['android']}},
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'opus',
         'preferredquality': '192',
     }],
+    # Thêm cấu hình để yt-dlp vượt qua bot detection tốt hơn
+    'extractor_args': {'youtube': {'player_client': ['web', 'default']}},
+    'cookiefile': 'cookies.txt',  # Nếu bạn đã thêm file cookies.txt
 }
 
 # Kiểm tra nếu có file cookies.txt thì sử dụng để tránh bị YouTube chặn

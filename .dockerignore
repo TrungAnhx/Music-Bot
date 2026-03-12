@@ -10,3 +10,4 @@ lavalink.log
 plugins/*.jar
 Dockerfile
 .dockerignore
+!cookies.txt

@@ -38,6 +38,11 @@ YDL_OPTIONS = {
     }],
 }
 
+# Kiểm tra nếu có file cookies.txt thì sử dụng để tránh bị YouTube chặn
+if os.path.exists('cookies.txt'):
+    YDL_OPTIONS['cookiefile'] = 'cookies.txt'
+    print("🍪 Đã tìm thấy cookies.txt, sử dụng để xác thực YouTube.")
+
 HELP_MESSAGE = (
     "`!play <tên bài>` – phát hoặc thêm bài vào hàng chờ\n"
     "`!skip` – bỏ qua bài hiện tại\n"

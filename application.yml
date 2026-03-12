@@ -26,6 +26,10 @@ plugins:
       - WEB
       - WEBEMBEDDED
     allowSearch: true
+    # Sử dụng file cookies.txt để xác thực
+    # Lưu ý: file này phải nằm trong cùng thư mục với Lavalink.jar (thư mục /app trong Docker)
+    # Tuy nhiên, plugin youtube hiện tại yêu cầu OAuth hoặc cấu hình qua tham số khác.
+    # Ta sẽ cấu hình yt-dlp trong code chính trước.
 
 logging:
   file:

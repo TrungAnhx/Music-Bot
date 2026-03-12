@@ -1,41 +1,32 @@
-# Sử dụng Python 3.10 bản Slim
-FROM python:3.10-slim
+# Sử dụng bản Python Full (Cực kỳ ổn định, đã có sẵn wget, unzip, sed...)
+FROM python:3.10-bullseye
 
-# Thiết lập môi trường để apt không hỏi xác nhận (non-interactive)
+# Thiết lập môi trường
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Cài đặt các công cụ: Java, FFmpeg, wget, unzip, sed, ca-certificates
-# Thêm --fix-missing để bỏ qua các gói lỗi mạng tạm thời và dọn dẹp kỹ hơn
-RUN apt-get update --fix-missing && \
-    apt-get install -y --no-install-recommends \
-    openjdk-17-jre-headless \
-    ffmpeg \
-    wget \
-    unzip \
-    sed \
-    ca-certificates \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Lệnh cài đặt Java và FFmpeg với cơ chế thử lại (Retry) nếu lỗi mạng của Render
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends openjdk-17-jre-headless ffmpeg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Nâng cấp pip và cài đặt thư viện Python
+# Nâng cấp pip và cài thư viện
 RUN pip install --no-cache-dir --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy toàn bộ code vào
+# Copy code
 COPY . .
 
-# Sửa lỗi xuống dòng Windows và phân quyền khởi động
+# Sửa lỗi xuống dòng và phân quyền
 RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
 
-# Tải Lavalink 4.0.8 ổn định
-RUN wget --quiet https://github.com/lavalink-devs/Lavalink/releases/download/4.0.8/Lavalink.jar
-
-# Tải YouTube plugin bản 1.17.0
+# Tải Lavalink và Plugin Youtube
+RUN wget -q https://github.com/lavalink-devs/Lavalink/releases/download/4.0.8/Lavalink.jar
 RUN mkdir -p plugins && \
-    wget --quiet https://github.com/lavalink-devs/youtube-source/releases/download/1.17.0/youtube-plugin-1.17.0.jar -P plugins/
+    wget -q https://github.com/lavalink-devs/youtube-source/releases/download/1.17.0/youtube-plugin-1.17.0.jar -P plugins/
 
 EXPOSE 7860
 

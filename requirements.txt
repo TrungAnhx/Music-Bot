@@ -1,5 +1,5 @@
 discord.py
-wavelink
+wavelink==3.1.0
 yt-dlp
 flask
 python-dotenv

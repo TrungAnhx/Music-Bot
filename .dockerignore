@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.pyc
+.env
+Lavalink.jar
+ffmpeg-*/
+logs/
+lavalink.log
+plugins/*.jar
+Dockerfile
+.dockerignore

@@ -215,7 +215,7 @@ class MusicBot(commands.Cog):
             return search
 
     @commands.Cog.listener()
-    async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload):
+    async def on_wavelink_node_ready(self, payload):
         logging.info(f"Lavalink node {payload.node.identifier} is ready!")
         print(f"✅ Lavalink node {payload.node.identifier} đã sẵn sàng!")
 
@@ -225,7 +225,7 @@ class MusicBot(commands.Cog):
         print(f"❌ Lỗi Lavalink: {payload}")
 
     @commands.Cog.listener()
-    async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload):
+    async def on_wavelink_track_end(self, payload):
         player = payload.player
         if not player:
             return
@@ -259,7 +259,7 @@ class MusicBot(commands.Cog):
             self.disconnect_tasks[guild_id] = task
 
     @commands.Cog.listener()
-    async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload):
+    async def on_wavelink_track_start(self, payload):
         player = payload.player
         if not player:
             return
@@ -449,7 +449,7 @@ class MusicBot(commands.Cog):
         await ctx.send("📋 **Lệnh của bot:**\n" + HELP_MESSAGE)
 
     @commands.Cog.listener()
-    async def on_wavelink_track_exception(self, payload: wavelink.TrackExceptionEventPayload):
+    async def on_wavelink_track_exception(self, payload):
         player = payload.player
         if not player:
             return
@@ -520,12 +520,13 @@ async def musichelp(interaction: discord.Interaction):
 async def main():
     import os
     import sys
+    import aiohttp
     
     # Lấy token từ environment variables để bảo mật
     token = os.environ.get("DISCORD_TOKEN")
     if not token:
         raise ValueError("DISCORD_TOKEN không được tìm thấy trong environment variables!")
-    print(f"Token (đầu 10 ký tự): {token[:10]}...")  # In ra 10 ký tự đầu để kiểm tra
+    print(f"Token (đầu 10 ký tự): {token[:10]}...") 
     
     # Kích hoạt keep_alive cho Hugging Face Spaces
     try:
@@ -536,6 +537,24 @@ async def main():
         print(f"⚠️ Không thể khởi động keep-alive: {e}")
     
     await client.add_cog(MusicBot(client))
-    await client.start(token)
+    
+    # Cơ chế Retry để vượt lỗi mạng của Hugging Face
+    max_retries = 10
+    retry_delay = 15
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"🚀 Thử kết nối đến Discord (Lần {attempt}/{max_retries})...")
+            await client.start(token)
+            break 
+        except (aiohttp.ClientConnectorError, aiohttp.ClientOSError) as e:
+            print(f"⚠️ Lỗi kết nối mạng: {e}")
+            if attempt < max_retries:
+                print(f"⏳ Sẽ thử lại sau {retry_delay} giây...")
+                await asyncio.sleep(retry_delay)
+            else:
+                print("❌ Đã hết lượt thử lại. Vui lòng kiểm tra lại Space hoặc Token.")
+        except Exception as e:
+            print(f"❌ Lỗi không xác định: {e}")
+            break
 
 asyncio.run(main())

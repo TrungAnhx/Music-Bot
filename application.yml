@@ -7,29 +7,21 @@ lavalink:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
     bufferDurationMs: 1000
     frameBufferDurationMs: 1000
+    # Tắt hoàn toàn plugin youtube có sẵn của Lavalink để tránh bị crash
+    youtubeSearchEnabled: false
     sources:
-      youtube: false
+      youtube: false  # TẮT YOUTUBE ĐỂ TRÁNH LỖI IP
       bandcamp: true
-      soundcloud: true
+      soundcloud: true # BẬT SOUNDCLOUD
       twitch: true
       vimeo: true
       http: true
       local: false
 
+# Nếu đang dùng plugin Youtube bên ngoài, cũng phải vô hiệu hóa nó
 plugins:
   youtube:
-    enabled: true
-    # Tối ưu hóa client để tìm nhạc nhanh hơn và tránh bị chặn
-    clients:
-      - MUSIC
-      - ANDROID_VR
-      - WEB
-      - WEBEMBEDDED
-    allowSearch: true
-    # Sử dụng file cookies.txt để xác thực
-    # Lưu ý: file này phải nằm trong cùng thư mục với Lavalink.jar (thư mục /app trong Docker)
-    # Tuy nhiên, plugin youtube hiện tại yêu cầu OAuth hoặc cấu hình qua tham số khác.
-    # Ta sẽ cấu hình yt-dlp trong code chính trước.
+    enabled: false # TẮT PLUGIN YOUTUBE
 
 logging:
   file:

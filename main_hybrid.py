@@ -286,7 +286,8 @@ class MusicBot(commands.Cog):
         if not ctx.voice_client:
             try:
                 # self_deaf=True giúp tiết kiệm băng thông vì bot không cần nghe user nói
-                player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player, self_deaf=True)
+                # Tăng timeout lên 60 giây để tránh lỗi kết nối chậm trên Hugging Face
+                player: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player, self_deaf=True, timeout=60.0)
             except Exception as e:
                 logging.error(f"Error connecting: {e}")
                 return await ctx.send(f"❌ Không thể kết nối vào voice: {str(e)}")
@@ -524,21 +525,44 @@ async def main():
     import socket
     
     # --- BẮT ĐẦU: FIX LỖI DNS CỦA HUGGING FACE ---
-    # Hugging Face chặn DNS nên ta phải "mồi" địa chỉ IP thật của discord.com
     try:
-        print("🌐 Đang thiết lập DNS đặc biệt cho Hugging Face...")
+        print("🌐 Đang thiết lập DNS đặc biệt (Toàn cầu) cho Hugging Face...")
+        import urllib.request
+        import json
+        
         discord_ips = ['162.159.135.232', '162.159.136.232', '162.159.137.232', '162.159.138.232', '162.159.128.233']
         _orig_getaddrinfo = socket.getaddrinfo
 
         def patched_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+            # Hardcode cho Discord để vào nhanh
             if host in ('discord.com', 'gateway.discord.gg'):
                 import random
                 ip = random.choice(discord_ips)
                 return [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (ip, port))]
-            return _orig_getaddrinfo(host, port, family, type, proto, flags)
+            
+            try:
+                # Thử dùng DNS gốc của hệ thống trước
+                return _orig_getaddrinfo(host, port, family, type, proto, flags)
+            except socket.gaierror:
+                # Nếu hệ thống lỗi (như trên Hugging Face), dùng Google DoH để phân giải
+                try:
+                    url = f"https://dns.google/resolve?name={host}&type=A"
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as response:
+                        data = json.loads(response.read().decode('utf-8'))
+                        if 'Answer' in data:
+                            for answer in data['Answer']:
+                                if answer['type'] == 1: # A record
+                                    ip = answer['data']
+                                    return [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (ip, port))]
+                except Exception as doh_e:
+                    print(f"⚠️ DoH failed for {host}: {doh_e}")
+                
+                # Nếu vẫn thất bại, đành văng lỗi gốc
+                raise
 
         socket.getaddrinfo = patched_getaddrinfo
-        print("✅ Đã thiết lập DNS thành công!")
+        print("✅ Đã thiết lập DNS toàn cầu thành công!")
     except Exception as dns_e:
         print(f"⚠️ Lỗi thiết lập DNS: {dns_e}")
     # --- KẾT THÚC: FIX LỖI DNS ---

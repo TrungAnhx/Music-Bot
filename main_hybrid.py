@@ -521,6 +521,27 @@ async def main():
     import os
     import sys
     import aiohttp
+    import socket
+    
+    # --- BẮT ĐẦU: FIX LỖI DNS CỦA HUGGING FACE ---
+    # Hugging Face chặn DNS nên ta phải "mồi" địa chỉ IP thật của discord.com
+    try:
+        print("🌐 Đang thiết lập DNS đặc biệt cho Hugging Face...")
+        discord_ips = ['162.159.135.232', '162.159.136.232', '162.159.137.232', '162.159.138.232', '162.159.128.233']
+        _orig_getaddrinfo = socket.getaddrinfo
+
+        def patched_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+            if host in ('discord.com', 'gateway.discord.gg'):
+                import random
+                ip = random.choice(discord_ips)
+                return [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (ip, port))]
+            return _orig_getaddrinfo(host, port, family, type, proto, flags)
+
+        socket.getaddrinfo = patched_getaddrinfo
+        print("✅ Đã thiết lập DNS thành công!")
+    except Exception as dns_e:
+        print(f"⚠️ Lỗi thiết lập DNS: {dns_e}")
+    # --- KẾT THÚC: FIX LỖI DNS ---
     
     # Lấy token từ environment variables để bảo mật
     token = os.environ.get("DISCORD_TOKEN")
